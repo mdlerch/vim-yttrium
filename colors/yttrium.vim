@@ -1,6 +1,6 @@
 " yttrium.vim a colorscheme for vim
 " Maintainer: Michael Lerch (github.com/mdlerch)
-" Version: 1.0
+" Version: 1.1
 
 " A lightish color scheme for 256 and gui vim.
 " Goals: easy on the eyes,
@@ -10,42 +10,49 @@
 "        very obvious diffs,
 "        consistency between gui and 256 term,
 
-" theme colors
-let s:color0C  = 251 " white 1 (dark)
-let s:color1C  = 131 " red 1 (brick)
-let s:color2C  = 109 " green 1 (sea green)
-let s:color3C  = 180 " yellow 1 (yellow)
-let s:color4C  = 67  " blue 1 (dark)
-let s:color5C  = 253 " magenta 1 (medium white)
-let s:color6C  = 239 " cyan 1 (medium black)
-let s:color7C  = 244 " black 1 (light)
-let s:color8C  = 255 " white 2 (light)
-let s:color9C  = 196 " red 2 (bright)
-let s:color10C = 118 " green 2 (bright)
-let s:color11C = 173 " yellow 2 (orange)
-let s:color12C = 110 " blue 2 (light)
-let s:color13C = 138 " magenta 2 (magenta)
-let s:color14C = 152 " cyan 2 (cyan)
-let s:color15C = 236 " black 2 (dark)
+" Normal: 0, 7
+" Gradient:  7, 6, 15, 5, 0, 8
 
-let s:color0G  = "#1c1c1c" " black 1 (dark)
-let s:color1G  = "#af5f5f" " red 1 (brick)
-let s:color2G  = "#87d7af" " green 1 (sea green)
-let s:color3G  = "#d7d7af" " yellow 1 (yellow)
-let s:color4G  = "#5f5f87" " blue 1 (dark)
-let s:color5G  = "#303030" " magenta 1 (medium black)
-let s:color6G  = "#d0d0d0" " cyan 1 (medium white)
-let s:color7G  = "#e4e4e4" " white 1 (light)
-let s:color8G  = "#444444" " black 2 (light)
-let s:color9G  = "#ff0000" " red 2 (bright)
-let s:color10G = "#87ff00" " green 2 (bright)
-let s:color11G = "#d7af87" " yellow 2 (orange)
-let s:color12G = "#87afd7" " blue 2 (light)
-let s:color13G = "#af8787" " magenta 2 (magenta)
-let s:color14G = "#87ffff" " cyan 2 (cyan)
-let s:color15G = "#949494" " white 2 (dark)
+" 0 black 1 (grey)
+" 1 red 1 (brick)
+" 2 green 1 (sea green)
+" 3 yellow 1 (yellow)
+" 4 blue 1 (dark)
+" 5 magenta 1 (medium black)
+" 6 cyan 1 (medium white)
+" 7 white 1 (light)
+" 8 black 2 (light)
+" 9 red 2 (bright)
+" 10 green 2 (bright)
+" 11 yellow 2 (orange)
+" 12 blue 2 (light)
+" 13 magenta 2 (magenta)
+" 14 cyan 2 (cyan)
+" 15 white 2 (dark white)
+
+" theme colors
+let s:themecol = [[240, "#585858"],
+               \  [131, "#af5f5f"],
+               \  [67,  "#5f78af"],
+               \  [180, "#dfaf87"],
+               \  [109, "#87afaf"],
+               \  [244, "#808080"],
+               \  [253, "#dadada"],
+               \  [255, "#eeeeee"],
+               \  [238, "#444444"],
+               \  [196, "#ff0000"],
+               \  [114, "#87ff00"],
+               \  [173, "#d7875f"],
+               \  [110, "#87afd7"],
+               \  [138, "#af8787"],
+               \  [152, "#afd7d7"],
+               \  [251, "#c6c6c6"]]
+
 
 " {{{ Set up
+set background=light
+
+" {{{ Setup
 set background=light
 
 " highlight clear removes user colors which is annoying if you use them, for
@@ -56,251 +63,149 @@ if exists("syntax_on")
 endif
 let g:colors_name = "yttrium"
 
-function! YttriumC(group, fg, bg, attr)
-    exec "hi clear " . a:group
-    if a:fg != ""
-        exec "hi " . a:group . " ctermfg=" . a:fg
-    endif
-    if a:bg != ""
-        exec "hi " . a:group . " ctermbg=" . a:bg
-    endif
-    if a:attr != ""
-        exec "hi " . a:group . " cterm=" . a:attr
-    endif
-endfunction
+" }}}
+" {{{ Function
 
-function! YttriumG(group, fg, bg, attr)
+function! s:Yttrium(group, fg, bg, cterm, gui)
     exec "hi clear " . a:group
-    if a:fg != ""
-        exec "hi " . a:group . " guifg=" . a:fg
+    if a:fg =~ '\d'
+        exec "hi " . a:group . " ctermfg=" . expand(s:themecol[a:fg][0]) . "guifg=" . expand(s:themecol[a:fg][1])
+    elseif a:fg == "NONE"
+        exec "hi " . a:group . " ctermfg=NONE" . " guifg=NONE"
     endif
-    if a:bg != ""
-        exec "hi " . a:group . " guibg=" . a:bg
+    if a:bg =~ '\d'
+        exec "hi " . a:group . " ctermbg=" . expand(s:themecol[a:bg][0])
+    elseif a:bg == "NONE"
+        exec "hi " . a:group . " ctermbg=NONE" . " guibg=NONE"
     endif
-    if a:attr != ""
-        exec "hi " . a:group . " gui=" . a:attr
+    if a:cterm != "" && a:cterm != "NONE"
+        exec "hi " . a:group . " cterm=" . a:cterm
+    elseif a:cterm == "NONE"
+        exec "hi " . a:group . " cterm=NONE"
+    endif
+    if a:gui != "" && a:gui != "NONE"
+        exec "hi " . a:group . " gui=" . a:gui
+    elseif a:gui == "NONE"
+        exec "hi " . a:group . " gui=NONE"
     endif
 endfunction
 
 " }}}
+" {{{ Vim groups
 
-if has("gui_running")
-    " {{{ Vim groups
-    call YttriumG("ColorColumn", "", s:color8G, "NONE")
-    call YttriumG("Conceal", s:color15G, s:color5G, "NONE")
-    call YttriumG("Cursor", "", s:color7G, "")
-    " call YttriumG("CursorIM", "NONE", s:color8G, "NONE")
-    " call YttriumG("CursorIM", "NONE", s:color8G, "NONE")
-    call YttriumG("CursorColumn", "NONE", s:color8G, "NONE")
-    call YttriumG("CursorLine", "", s:color8G, "NONE")
-    " call YttriumG("Directory", "NONE", s:color8G, "NONE")
-    call YttriumG("DiffAdd", s:color10G, s:color5G, "NONE")
-    call YttriumG("DiffChange", s:color2G, s:color5G, "NONE")
-    call YttriumG("DiffDelete", s:color9G, s:color5G, "NONE")
-    call YttriumG("DiffText", s:color9G, s:color5G, "NONE")
-    call YttriumG("ErrorMsg", s:color1G, s:color0G, "NONE")
-    call YttriumG("VertSplit", s:color4G, s:color8G, "NONE")
-    call YttriumG("Folded", s:color7G, s:color0G, "NONE")
-    " call YttriumG("FoldColumn", "NONE", s:color8G, "NONE")
-    " call YttriumG("SignColumn", "NONE", s:color8G, "NONE")
-    call YttriumG("IncSearch", s:color5G, s:color3G, "NONE")
-    call YttriumG("LineNr", s:color8G, s:color0G, "NONE")
-    call YttriumG("CursorLineNr", s:color7G, s:color5G, "NONE")
-    call YttriumG("MatchParen", "", s:color0G, "NONE")
-    " call YttriumG("ModeMsg", "NONE", s:color8G, "NONE")
-    " call YttriumG("MoreMsg", "NONE", s:color8G, "NONE")
-    call YttriumG("NonText", s:color8G, s:color5G, "NONE")
-    call YttriumG("Normal", s:color6G, s:color5G, "NONE")
-    call YttriumG("Pmenu", s:color15G, s:color8G, "NONE")
-    call YttriumG("PmenuSel", s:color7G, s:color0G, "NONE")
-    call YttriumG("PmenSbar", "", s:color8G, "NONE")
-    call YttriumG("PmenuThumb", "", s:color8G, "NONE")
-    call YttriumG("Question", s:color6G, s:color8G, "NONE")
-    call YttriumG("Search", s:color5G, s:color13G, "NONE")
-    call YttriumG("SignColumn", s:color9G, s:color0G, "NONE")
-    call YttriumG("SpecialKey", s:color8G, s:color5G, "NONE")
-    call YttriumG("SpellBad", s:color13G, "", "undercurl")
-    call YttriumG("SpellCap", s:color13G, "", "undercurl")
-    " call YttriumG("SpellLocal", "NONE", s:color8G, "NONE")
-    " call YttriumG("SpellRare", "NONE", s:color8G, "NONE")
-    " call YttriumG("StatusLine", "NONE", s:color8G, "NONE")
-    " call YttriumG("StatusLineNC", "NONE", s:color8G, "NONE")
-    call YttriumG("TabLine", s:color15G, s:color0G, "NONE")
-    call YttriumG("TabLineFill", s:color15G, s:color0G, "NONE")
-    call YttriumG("TabLineSel", s:color7G, s:color5G, "NONE")
-    call YttriumG("Title", s:color2G, "NONE", "NONE")
-    call YttriumG("Visual", "", s:color0G, "NONE")
-    " call YttriumG("VisualNOS", "NONE", s:color8G, "NONE")
-    call YttriumG("WarningMSG", s:color4G, s:color0G, "NONE")
-    " call YttriumG("WildMenu", "NONE", s:color8G, "NONE")
-    " }}} Vim groups
-    " {{{ Highlight groups
-    call YttriumG("Comment", s:color4G, "", "")
-    call YttriumG("Constant", s:color11G, "", "")
-    call YttriumG("String", s:color2G, "", "")
-    call YttriumG("Character", s:color1G, "", "")
-    call YttriumG("Number", s:color12G, "", "")
-    call YttriumG("Boolean", s:color12G, "", "")
-    call YttriumG("Float", s:color12G, "", "")
-    call YttriumG("Identifier", s:color2G, "", "NONE")
-    call YttriumG("Function", s:color15G, "", "NONE")
-    call YttriumG("Statement", s:color11G, "", "")
-    call YttriumG("Conditional", s:color3G, "", "")
-    call YttriumG("Repeat", s:color3G, "", "")
-    call YttriumG("Label", "", "", "")
-    call YttriumG("Operator", s:color1G, "", "NONE")
-    call YttriumG("Keyword", s:color3G, "", "NONE")
-    call YttriumG("Exception", "", "", "NONE")
-    call YttriumG("PreProc", s:color14G, "", "")
-    call YttriumG("Include", s:color14G, "", "")
-    call YttriumG("Define", s:color14G, "", "NONE")
-    call YttriumG("Macro", s:color14G, "", "NONE")
-    call YttriumG("PreCondit", s:color1G, "", "NONE")
-    call YttriumG("Type", s:color15G, "", "NONE")
-    call YttriumG("StorageClass", s:color12G, "", "NONE")
-    call YttriumG("Structure", "", "", "")
-    call YttriumG("Typedef", "", "", "")
-    call YttriumG("Special", s:color1G, "", "")
-    call YttriumG("SpecialChar", s:color6G, "", "")
-    call YttriumG("Tag", "", "", "")
-    call YttriumG("Delimiter", s:color15G, "", "")
-    call YttriumG("SpecialComment", s:color6G, "", "")
-    call YttriumG("Debug", s:color6G, "", "")
-    call YttriumG("Underlined",s:color6G, s:color5G, "underline")
-    call YttriumG("Error",s:color9G, "", "")
-    call YttriumG("Todo", s:color9G, s:color8G, "")
-    " }}} Highlight groups
-    " {{{ misc
-    " TagHighlight
-    call YttriumG("LocalVariable", "", "", "NONE")
-    call YttriumG("Member", "", "", "NONE")
-    " mail
-    call YttriumG("mailQuoted1", s:color11G, "", "NONE")
-    call YttriumG("mailQuoted2", s:color13G, "", "NONE")
-    call YttriumG("mailQuoted3", s:color1G, "", "NONE")
-    call YttriumG("mailQuoted4", s:color4G, "", "NONE")
-    call YttriumG("mailQuoted5", s:color12G, "", "NONE")
-    call YttriumG("mailQuoted6", s:color2G, "", "NONE")
-    " vim
-    call YttriumG("vimOption", s:color3G, "", "NONE")
-    call YttriumG("qfLineNr", s:color1G, s:color5G, "NONE")
-    " ycm
-    call YttriumG("YcmErrorSign", s:color9G, s:color0G, "NONE")
-    call YttriumG("YcmWarningSign", s:color9G, s:color0G, "NONE")
-    call YttriumG("YcmErrorSection", s:color1G, "", "NONE")
-    call YttriumG("YcmWarningSection", s:color1G, "", "NONE")
-    " }}}
-endif
+"              Group             fg       bg       term          gui
+call s:Yttrium("ColorColumn"    , ""     , 8      , "NONE"      , "NONE")
+call s:Yttrium("Conceal"        , 15     , 5      , "NONE"      , "NONE")
+call s:Yttrium("Cursor"         , ""     , ""     , ""          , "")
+" call s:Yttrium ("CursorIM"    , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("CursorColumn"   , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("CursorLine"     , ""     , 15     , "NONE"      , "NONE")
+" call s:Yttrium("Directory"    , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("DiffAdd"        , 10     , 7      , "NONE"      , "NONE")
+call s:Yttrium("DiffChange"     , 14     , 7      , "NONE"      , "NONE")
+call s:Yttrium("DiffDelete"     , 9      , 7      , "NONE"      , "NONE")
+call s:Yttrium("DiffText"       , 9      , 7      , "NONE"      , "NONE")
+call s:Yttrium("ErrorMsg"       , 1      , 0      , "NONE"      , "NONE")
+call s:Yttrium("VertSplit"      , 4      , 8      , "NONE"      , "NONE")
+call s:Yttrium("Folded"         , 8      , 5     , "NONE"      , "NONE")
+call s:Yttrium("FoldColumn"     , 8      , 0      , "NONE"      , "NONE")
+" call s:Yttrium("SignColumn"   , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("IncSearch"      , 5      , 3      , "NONE"      , "NONE")
+call s:Yttrium("LineNr"         , 8      , 15     , "NONE"      , "NONE")
+call s:Yttrium("CursorLineNr"   , 0      , 7      , "NONE"      , "NONE")
+call s:Yttrium("MatchParen"     , ""     , 0      , "NONE"      , "NONE")
+" call s:Yttrium("ModeMsg"      , "NONE" , 8      , "NONE"      , "NONE")
+" call s:Yttrium("MoreMsg"      , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("NonText"        , 8      , 5      , "NONE"      , "NONE")
+call s:Yttrium("Normal"         , 0      , 7      , "NONE"      , "NONE")
+call s:Yttrium("Pmenu"          , 15     , 8      , "NONE"      , "NONE")
+call s:Yttrium("PmenuSel"       , 7      , 0      , "NONE"      , "NONE")
+call s:Yttrium("PmenuSbar"      , ""     , "NONE" , "NONE"      , "NONE")
+call s:Yttrium("PmenuThumb"     , ""     , "NONE" , "NONE"      , "NONE")
+call s:Yttrium("Question"       , 6      , 8      , "NONE"      , "NONE")
+call s:Yttrium("Search"         , 5      , 13     , "NONE"      , "NONE")
+call s:Yttrium("SignColumn"     , 9      , 0      , "NONE"      , "NONE")
+call s:Yttrium("SpecialKey"     , 8      , 5      , "NONE"      , "NONE")
+call s:Yttrium("SpellBad"       , 13     , ""     , "underline" , "undercurl")
+call s:Yttrium("SpellCap"       , 13     , ""     , "underline" , "undercurl")
+" call s:Yttrium("SpellLocal"   , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("SpellRare"      , 13     , ""     , "NONE"      , "NONE")
+" call s:Yttrium("StatusLine"   , "NONE" , 8      , "NONE"      , "NONE")
+" call s:Yttrium("StatusLineNC" , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("TabLine"        , 15     , 0      , "NONE"      , "NONE")
+call s:Yttrium("TabLineFill"    , 15     , 0      , "NONE"      , "NONE")
+call s:Yttrium("TabLineSel"     , 7      , 5      , "NONE"      , "NONE")
+call s:Yttrium("Title"          , 2      , "NONE" , "NONE"      , "NONE")
+call s:Yttrium("Visual"         , ""     , 6     , "NONE"      , "NONE")
+" call s:Yttrium("VisualNOS"    , "NONE" , 8      , "NONE"      , "NONE")
+call s:Yttrium("WarningMSG"     , 4      , 0      , "NONE"      , "NONE")
+" call s:Yttrium("WildMenu"     , "NONE" , 8      , "NONE"      , "NONE")
+" }}} Vim groups
+" {{{ Highlight groups
 
-if &t_Co==256
-    " {{{ Vim groups
-    call YttriumC("ColorColumn", "", s:color5C, "NONE")
-    call YttriumC("Conceal", s:color15C, s:color5C, "NONE")
-    call YttriumC("Cursor", "", "", "")
-    " call Yttrium ("CursorIM", "NONE", s:color8C, "NONE")
-    call YttriumC("CursorColumn", "NONE", s:color5C, "NONE")
-    call YttriumC("CursorLine", "", s:color5C, "NONE")
-    " call YttriumC("Directory", "NONE", s:color8C, "NONE")
-    call YttriumC("DiffAdd", s:color10C, s:color5C, "NONE")
-    call YttriumC("DiffChange", s:color14C, s:color5C, "NONE")
-    call YttriumC("DiffDelete", s:color9C, s:color5C, "NONE")
-    call YttriumC("DiffText", s:color9C, s:color5C, "NONE")
-    call YttriumC("ErrorMsg", s:color1C, s:color0C, "NONE")
-    call YttriumC("VertSplit", s:color4C, s:color8C, "NONE")
-    call YttriumC("Folded", s:color7C, s:color0C, "NONE")
-    " call YttriumC("FoldColumn", "NONE", s:color8C, "NONE")
-    " call YttriumC("SignColumn", "NONE", s:color8C, "NONE")
-    call YttriumC("IncSearch", s:color5C, s:color3C, "NONE")
-    call YttriumC("LineNr", s:color7C, s:color5C, "NONE")
-    call YttriumC("CursorLineNr", s:color8C, s:color0C, "NONE")
-    call YttriumC("MatchParen", "", s:color0C, "NONE")
-    " call YttriumC("ModeMsg", "NONE", s:color8C, "NONE")
-    " call YttriumC("MoreMsg", "NONE", s:color8C, "NONE")
-    call YttriumC("NonText", s:color8C, s:color8C, "NONE")
-    call YttriumC("Normal", s:color6C, s:color8C, "NONE")
-    call YttriumC("Pmenu", s:color15C, s:color8C, "NONE")
-    call YttriumC("PmenuSel", s:color7C, s:color0C, "NONE")
-    call YttriumC("PmenSbar", "", s:color8C, "NONE")
-    call YttriumC("PmenuThumb", "", s:color8C, "NONE")
-    call YttriumC("Question", s:color6C, s:color8C, "NONE")
-    call YttriumC("Search", s:color5C, s:color13C, "NONE")
-    call YttriumC("SignColumn", s:color9C, s:color0C, "NONE")
-    call YttriumC("SpecialKey", s:color8C, s:color5C, "NONE")
-    call YttriumC("SpellBad", s:color13C, "", "underline")
-    call YttriumC("SpellCap", s:color13C, "", "underline")
-    " call YttriumC("SpellLocal", "NONE", s:color8C, "NONE")
-    " call YttriumC("SpellRare", "NONE", s:color8C, "NONE")
-    " call YttriumC("StatusLine", "NONE", s:color8C, "NONE")
-    " call YttriumC("StatusLineNC", "NONE", s:color8C, "NONE")
-    call YttriumC("TabLine", s:color15C, s:color0C, "NONE")
-    call YttriumC("TabLineFill", s:color15C, s:color0C, "NONE")
-    call YttriumC("TabLineSel", s:color7C, s:color5C, "NONE")
-    call YttriumC("Title", s:color2C, "NONE", "NONE")
-    call YttriumC("Visual", "", s:color0C, "NONE")
-    " call YttriumC("VisualNOS", "NONE", s:color8C, "NONE")
-    call YttriumC("WarningMSG", s:color4C, s:color0C, "NONE")
-    " call YttriumC("WildMenu", "NONE", s:color8C, "NONE")
-    " }}} Vim groups
-    " {{{ Highlight groups
-    call YttriumC("Comment", s:color4C, "", "")
-    call YttriumC("Constant", s:color11C, "", "")
-    call YttriumC("String", s:color2C, "", "")
-    call YttriumC("Character", s:color1C, "", "")
-    call YttriumC("Number", s:color12C, "", "")
-    call YttriumC("Boolean", s:color12C, "", "")
-    call YttriumC("Float", s:color12C, "", "")
-    call YttriumC("Identifier", s:color2C, "", "NONE")
-    call YttriumC("Function", s:color15C, "", "NONE")
-    call YttriumC("Statement", s:color11C, "", "")
-    call YttriumC("Conditional", s:color3C, "", "")
-    call YttriumC("Repeat", s:color3C, "", "")
-    call YttriumC("Label", "", "", "")
-    call YttriumC("Operator", s:color1C, "", "NONE")
-    call YttriumC("Keyword", s:color3C, "", "NONE")
-    call YttriumC("Exception", "", "", "NONE")
-    call YttriumC("PreProc", s:color14C, "", "")
-    call YttriumC("Include", s:color14C, "", "")
-    call YttriumC("Define", s:color14C, "", "NONE")
-    call YttriumC("Macro", s:color14C, "", "NONE")
-    call YttriumC("PreCondit", s:color1C, "", "NONE")
-    call YttriumC("Type", s:color15C, "", "NONE")
-    call YttriumC("StorageClass", s:color12C, "", "NONE")
-    call YttriumC("Structure", "", "", "")
-    call YttriumC("Typedef", "", "", "")
-    call YttriumC("Special", s:color1C, "", "")
-    call YttriumC("SpecialChar", s:color6C, "", "")
-    call YttriumC("Tag", "", "", "")
-    call YttriumC("Delimiter", s:color15C, "", "")
-    call YttriumC("SpecialComment", s:color6C, "", "")
-    call YttriumC("Debug", s:color6C, "", "")
-    call YttriumC("Underlined",s:color6C, s:color5C, "italic")
-    call YttriumC("Error",s:color9C, "", "")
-    call YttriumC("Todo", s:color9C, s:color8C, "")
-    " }}} Highlight groups
-    " {{{ Misc
-    " TagHighlight
-    call YttriumC("CTagsLocalVariable", "", "", "NONE")
-    call YttriumC("CTagsMember", "", "", "NONE")
-    " mail
-    call YttriumC("mailQuoted1", s:color11C, "", "NONE")
-    call YttriumC("mailQuoted2", s:color13C, "", "NONE")
-    call YttriumC("mailQuoted3", s:color1C, "", "NONE")
-    call YttriumC("mailQuoted4", s:color4C, "", "NONE")
-    call YttriumC("mailQuoted5", s:color12C, "", "NONE")
-    call YttriumC("mailQuoted6", s:color2C, "", "NONE")
-    " status
-    call YttriumC("status1", s:color4C, s:color0C, "NONE")
-    call YttriumC("status2", s:color11C, s:color5C, "NONE")
-    call YttriumC("status3", s:color9C, s:color0C, "NONE")
-    " vim
-    call YttriumC("vimOption", s:color3C, "", "NONE")
-    call YttriumC("qfLineNr", s:color1C, s:color5C, "NONE")
-    " ycm
-    call YttriumC("YcmErrorSign", s:color1C, s:color0C, "NONE")
-    call YttriumC("YcmWarningSign", s:color1C, s:color0C, "NONE")
-    call YttriumC("YcmErrorSection", s:color1C, "", "NONE")
-    call YttriumC("YcmWarningSection", s:color1C, "", "NONE")
-    " }}}
-endif
+call s:Yttrium("Comment"        , 4      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Constant"       , 11     , ""     , "NONE"      , "NONE")
+call s:Yttrium("String"         , 2      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Character"      , 1      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Number"         , 12     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Boolean"        , 12     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Float"          , 12     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Identifier"     , 2      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Function"       , 15     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Statement"      , 11     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Conditional"    , 3      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Repeat"         , 3      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Label"          , ""     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Operator"       , 1      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Keyword"        , 3      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Exception"      , ""     , ""     , "NONE"      , "NONE")
+call s:Yttrium("PreProc"        , 14     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Include"        , 14     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Define"         , 14     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Macro"          , 14     , ""     , "NONE"      , "NONE")
+call s:Yttrium("PreCondit"      , 1      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Type"           , 11     , ""     , "NONE"      , "NONE")
+call s:Yttrium("StorageClass"   , 12     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Structure"      , ""     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Typedef"        , ""     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Special"        , 1      , ""     , "NONE"      , "NONE")
+call s:Yttrium("SpecialChar"    , 6      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Tag"            , ""     , ""     , "NONE"      , "NONE")
+call s:Yttrium("Delimiter"      , 15     , ""     , "NONE"      , "NONE")
+call s:Yttrium("SpecialComment" , 6      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Debug"          , 6      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Underlined"     , 6      , 5      , "underline" , "underline")
+call s:Yttrium("Error"          , 9      , ""     , "NONE"      , "NONE")
+call s:Yttrium("Todo"           , 9      , 8      , "NONE"      , "NONE")
+
+" }}} Highlight groups
+" {{{ Misc
+
+" TagHighlight
+call s:Yttrium("CTagsLocalVariable" , "" , "" , "NONE" , "NONE")
+call s:Yttrium("CTagsMember"        , "" , "" , "NONE" , "NONE")
+" mail
+call s:Yttrium("mailQuoted1" , 11 , "" , "NONE" , "NONE")
+call s:Yttrium("mailQuoted2" , 13 , "" , "NONE" , "NONE")
+call s:Yttrium("mailQuoted3" , 1  , "" , "NONE" , "NONE")
+call s:Yttrium("mailQuoted4" , 4  , "" , "NONE" , "NONE")
+call s:Yttrium("mailQuoted5" , 12 , "" , "NONE" , "NONE")
+call s:Yttrium("mailQuoted6" , 2  , "" , "NONE" , "NONE")
+" Nvim-R / Vim-R-plugin
+call s:Yttrium("routInput" , 3 , "" , "NONE" , "NONE")
+" status
+call s:Yttrium("status1" , 12 , 0 , "NONE" , "NONE")
+call s:Yttrium("status2" , 11 , 8 , "NONE" , "NONE")
+call s:Yttrium("status3" , 9  , 0 , "NONE" , "NONE")
+" vim
+call s:Yttrium("vimOption" , 3 , "" , "NONE" , "NONE")
+call s:Yttrium("qfLineNr"  , 1 , 5  , "NONE" , "NONE")
+" ycm
+call s:Yttrium("YcmErrorSign"      , 1 , 0  , "NONE" , "NONE")
+call s:Yttrium("YcmWarningSign"    , 1 , 0  , "NONE" , "NONE")
+call s:Yttrium("YcmErrorSection"   , 1 , "" , "NONE" , "NONE")
+call s:Yttrium("YcmWarningSection" , 1 , "" , "NONE" , "NONE")
+
+" }}}
 
 " vim: set fdm=marker:fdl=1
